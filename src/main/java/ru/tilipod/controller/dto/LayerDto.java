@@ -2,6 +2,7 @@ package ru.tilipod.controller.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
 import ru.tilipod.controller.dto.enums.LayerTypeEnum;
@@ -21,15 +22,24 @@ public class LayerDto {
     @ApiModelProperty(value = "Кол-во выходов", required = true)
     private Integer countOutput;
 
-    @ApiModelProperty(value = "Высота фильтра (только для сверточного слоя)")
+    @ApiModelProperty(value = "Высота шага")
     private Integer strideHeight;
 
-    @ApiModelProperty(value = "Ширина фильтра (только для сверточного слоя)")
+    @ApiModelProperty(value = "Ширина шага")
     private Integer strideWeight;
+
+    @ApiModelProperty(value = "Высота фильтра")
+    private Integer kernelHeight;
+
+    @ApiModelProperty(value = "Ширина фильтра")
+    private Integer kernelWeight;
 
     @ApiModelProperty(value = "Способ инициализации весов нейронов слоя")
     private WeightInit weightInitType;
 
     @ApiModelProperty(value = "Функция активации для нейронов слоя")
     private Activation activationType;
+
+    @ApiModelProperty(value = "Тип пулинга")
+    private SubsamplingLayer.PoolingType poolingType;
 }

@@ -9,6 +9,7 @@ import org.deeplearning4j.nn.conf.layers.BatchNormalization;
 import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
+import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.activations.Activation;
@@ -130,6 +131,7 @@ public class ParserServiceImpl implements ParserService {
         switch (layer.getLayerType()) {
             case CONVOLUTIONAL -> builder.layer(layer.getLayerNumber(), createConvolutionalLayer(layer));
             case BATCH_NORMALIZATION -> builder.layer(layer.getLayerNumber(), createBatchNormalizationLayer(layer));
+            case SUBSAMPLING -> builder.layer(layer.getLayerNumber(), createSubsamplingLayer(layer));
             case DENSE -> builder.layer(layer.getLayerNumber(), createDenseLayer(layer));
             case OUTPUT -> builder.layer(layer.getLayerNumber(), createOutputLayer(layer));
             default -> throw new InvalidRequestException(String.format("Неподдерживаемый тип слоя %s. Задача с id = %d", layer.getLayerType(),
@@ -166,6 +168,16 @@ public class ParserServiceImpl implements ParserService {
                 .nOut(layer.getCountOutput())
                 .weightInit(Objects.requireNonNullElse(layer.getWeightInitType(), Constants.DEFAULT_WEIGHT_INIT))
                 .activation(Objects.requireNonNullElse(layer.getActivationType(), Constants.DEFAULT_ACTIVATION))
+                .build();
+    }
+
+    private SubsamplingLayer createSubsamplingLayer(LayerDto layer) {
+        return new SubsamplingLayer.Builder()
+                .poolingType(layer.getPoolingType())
+                .kernelSize(Objects.requireNonNullElse(layer.getKernelHeight(), Constants.DEFAULT_STRIDE_HEIGHT),
+                            Objects.requireNonNullElse(layer.getKernelWeight(), Constants.DEFAULT_STRIDE_WEIGHT))
+                .stride(Objects.requireNonNullElse(layer.getStrideHeight(), Constants.DEFAULT_STRIDE_HEIGHT),
+                        Objects.requireNonNullElse(layer.getStrideWeight(), Constants.DEFAULT_STRIDE_WEIGHT))
                 .build();
     }
 
