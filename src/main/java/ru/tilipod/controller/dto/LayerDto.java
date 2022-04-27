@@ -19,7 +19,7 @@ public class LayerDto {
     @ApiModelProperty(value = "Кол-во входов")
     private Integer countInput;
 
-    @ApiModelProperty(value = "Кол-во выходов", required = true)
+    @ApiModelProperty(value = "Кол-во выходов")
     private Integer countOutput;
 
     @ApiModelProperty(value = "Высота шага")
