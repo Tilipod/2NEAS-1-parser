@@ -4,5 +4,7 @@ import ru.tilipod.controller.dto.NeuronNetworkDto;
 
 public interface ParserService {
 
-    void parseNeuronNetwork(NeuronNetworkDto nn);
+    void parseRl4jNetwork(NeuronNetworkDto nn);
+
+    void parseDl4jNetwork(NeuronNetworkDto nn);
 }

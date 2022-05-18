@@ -34,6 +34,9 @@ public class NeuronNetworkDto {
     @ApiModelProperty(value = "Настройки регуляризации")
     private RegularizationDto regularization;
 
+    @ApiModelProperty(value = "Настройки подкрепления при обучении")
+    private ReforcementDto reforcement;
+
     @ApiModelProperty(value = "Настройки оптимизации скорости обучения")
     private UpdaterDto updater;
 

@@ -11,6 +11,7 @@ import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.rl4j.learning.sync.qlearning.QLearning;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.learning.config.Nesterovs;
@@ -41,9 +42,7 @@ public class ParserServiceImpl implements ParserService {
 
     private final RabbitSender rabbitSender;
 
-    @Override
-    @Async
-    public void parseNeuronNetwork(NeuronNetworkDto nn) {
+    private MultiLayerNetwork parseNetwork(NeuronNetworkDto nn) {
         try {
             NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder()
                     .iterations(Objects.requireNonNullElse(nn.getIterations(), Constants.DEFAULT_ITERATIONS))
@@ -65,12 +64,55 @@ public class ParserServiceImpl implements ParserService {
             net.init();
 
             saveNetwork(net, nn.getPathToSave(), nn.getTaskId());
-            rabbitSender.sendSuccessToScheduler(ParserResultSuccessMessage.createMessage(nn.getTaskId(), nn.getPathToSave()));
-            log.info("Завершен парсинг нейронной сети по задаче {}", nn.getTaskId());
+            return net;
         } catch (Exception e) {
             log.error("Ошибка парсинга сети. Задача: {}, ошибка: {}", nn.getTaskId(), e.getMessage());
             rabbitSender.sendErrorToScheduler(ParserResultErrorMessage.createMessage(nn.getTaskId(), e));
+            return null;
         }
+    }
+
+    private QLearning.QLConfiguration parseQLConfiguration(NeuronNetworkDto nn) {
+        return QLearning.QLConfiguration.builder()
+                .seed(Objects.requireNonNullElse(nn.getSeed(), Constants.DEFAULT_SEED))
+                .maxEpochStep(Objects.requireNonNullElse(nn.getReforcement().getCountEpoch(), Constants.DEFAULT_COUNT_EPOCH))
+                .maxStep(Objects.requireNonNullElse(nn.getIterations(), Constants.DEFAULT_ITERATIONS))
+                .batchSize(Constants.DEFAULT_BATCH_SIZE)
+                .targetDqnUpdateFreq(Constants.DEFAULT_TARGET_DQN_UPDATE_FREQ)
+                .updateStart(Objects.requireNonNullElse(nn.getReforcement().getUpdateStart(), Constants.DEFAULT_UPDATE_START))
+                .rewardFactor(Objects.requireNonNullElse(nn.getReforcement().getRewardFactor(), Constants.DEFAULT_REWARD_FACTOR))
+                .gamma(Objects.requireNonNullElse(nn.getReforcement().getGamma(), Constants.DEFAULT_GAMMA))
+                .errorClamp(Objects.requireNonNullElse(nn.getReforcement().getErrorClamp(), Constants.DEFAULT_ERROR_CLAMP))
+                .minEpsilon(Objects.requireNonNullElse(nn.getReforcement().getMinEpsilon(), Constants.DEFAULT_MIN_EPSILON))
+                .epsilonNbStep(Objects.requireNonNullElse(nn.getReforcement().getEpsilonStep(), Constants.DEFAULT_EPSILON_STEP))
+                .doubleDQN(true)
+                .build();
+    }
+
+    @Override
+    @Async
+    public void parseRl4jNetwork(NeuronNetworkDto nn) {
+        MultiLayerNetwork net = parseNetwork(nn);
+        if (net == null) {
+            return;
+        }
+
+        QLearning.QLConfiguration conf = parseQLConfiguration(nn);
+
+        rabbitSender.sendSuccessToScheduler(ParserResultSuccessMessage.createMessage(nn.getTaskId(), nn.getPathToSave(), conf));
+        log.info("Завершен парсинг нейронной сети по задаче {}", nn.getTaskId());
+    }
+
+    @Override
+    @Async
+    public void parseDl4jNetwork(NeuronNetworkDto nn) {
+        MultiLayerNetwork net = parseNetwork(nn);
+        if (net == null) {
+            return;
+        }
+
+        rabbitSender.sendSuccessToScheduler(ParserResultSuccessMessage.createMessage(nn.getTaskId(), nn.getPathToSave()));
+        log.info("Завершен парсинг нейронной сети по задаче {}", nn.getTaskId());
     }
 
     private void saveNetwork(MultiLayerNetwork net, String pathToSave, Integer taskId) {

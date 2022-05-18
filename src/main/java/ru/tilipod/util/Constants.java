@@ -9,6 +9,15 @@ import ru.tilipod.controller.dto.enums.UpdaterTypeEnum;
 public class Constants {
     public static final int DEFAULT_ITERATIONS = 1;
     public static final int DEFAULT_SEED = 123;
+    public static final int DEFAULT_COUNT_EPOCH = 100;
+    public static final int DEFAULT_BATCH_SIZE = 1;
+    public static final int DEFAULT_TARGET_DQN_UPDATE_FREQ = 100;
+    public static final int DEFAULT_UPDATE_START = 10;
+    public static final int DEFAULT_EPSILON_STEP = 10000;
+    public static final double DEFAULT_REWARD_FACTOR = 1.0;
+    public static final double DEFAULT_GAMMA = 0.99;
+    public static final double DEFAULT_ERROR_CLAMP = 1.0;
+    public static final float DEFAULT_MIN_EPSILON = 0.1f;
     public static final double DEFAULT_LEARNING_RATE = 0.00001;
     public static final WeightInit DEFAULT_WEIGHT_INIT = WeightInit.XAVIER;
     public static final OptimizationAlgorithm DEFAULT_OPTIMIZATION_ALGORITHM = OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT;

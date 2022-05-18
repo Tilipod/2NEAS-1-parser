@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.tilipod.controller.dto.NeuronNetworkDto;
 import ru.tilipod.service.ParserService;
@@ -21,8 +22,13 @@ public class ParsingController {
 
     @PostMapping("/parsing")
     @ApiOperation(value = "Воспроизвести структуру нейронной сети по запросу клиента")
-    public ResponseEntity<Void> parseNeuronNetwork(@RequestBody NeuronNetworkDto neuronNetworkDto) {
-        parserService.parseNeuronNetwork(neuronNetworkDto);
+    public ResponseEntity<Void> parseNeuronNetwork(@RequestBody NeuronNetworkDto neuronNetworkDto,
+                                                   @RequestParam(defaultValue = "false") Boolean withMentoring) {
+        if (withMentoring) {
+            parserService.parseRl4jNetwork(neuronNetworkDto);
+        } else {
+            parserService.parseDl4jNetwork(neuronNetworkDto);
+        }
         return ResponseEntity.ok().build();
     }
 }
