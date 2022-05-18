@@ -9,6 +9,7 @@ import ru.tilipod.controller.dto.enums.UpdaterTypeEnum;
 public class Constants {
     public static final int DEFAULT_ITERATIONS = 1;
     public static final int DEFAULT_SEED = 123;
+    public static final int DEFAULT_EXP_REP_SIZE = 2;
     public static final int DEFAULT_COUNT_EPOCH = 100;
     public static final int DEFAULT_BATCH_SIZE = 1;
     public static final int DEFAULT_TARGET_DQN_UPDATE_FREQ = 100;

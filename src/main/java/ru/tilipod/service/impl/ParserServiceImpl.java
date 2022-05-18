@@ -78,6 +78,7 @@ public class ParserServiceImpl implements ParserService {
                 .maxEpochStep(Objects.requireNonNullElse(nn.getReforcement().getCountEpoch(), Constants.DEFAULT_COUNT_EPOCH))
                 .maxStep(Objects.requireNonNullElse(nn.getIterations(), Constants.DEFAULT_ITERATIONS))
                 .batchSize(Constants.DEFAULT_BATCH_SIZE)
+                .expRepMaxSize(Constants.DEFAULT_EXP_REP_SIZE)
                 .targetDqnUpdateFreq(Constants.DEFAULT_TARGET_DQN_UPDATE_FREQ)
                 .updateStart(Objects.requireNonNullElse(nn.getReforcement().getUpdateStart(), Constants.DEFAULT_UPDATE_START))
                 .rewardFactor(Objects.requireNonNullElse(nn.getReforcement().getRewardFactor(), Constants.DEFAULT_REWARD_FACTOR))
